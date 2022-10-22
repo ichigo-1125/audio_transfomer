@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  ##############################################################################
+  # Python
+  ##############################################################################
+  python3:
+    build:
+      context: ./docker/python
+    container_name: ${PYTHON_CONTAINER}
+    working_dir: '/root/src'
+    tty: true
+    restart: always
+    volumes:
+      - ${SRC_PATH}:/root/src
