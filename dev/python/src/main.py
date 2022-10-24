@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 INPUT_SIZE = 441
-BATCH_SIZE = 1
+BATCH_SIZE = 10
 
 class Net( nn.Module ):
 
@@ -15,8 +15,8 @@ class Net( nn.Module ):
     def __init__( self, input_size ):
         super(Net, self).__init__()
         self.fc1 = nn.Flatten()
-        self.fc2 = nn.Linear(input_size, 100)
-        self.fc3 = nn.Linear(100, 2)
+        self.fc2 = nn.Linear(input_size, 200)
+        self.fc3 = nn.Linear(200, 2)
 
     # 順伝播
     def forward(self, x):
@@ -43,6 +43,7 @@ label_num = len(labels)
 p_data = []
 p_label = []
 for raw_data in dataset:
+
     # データ
     data = raw_data['data'] / (2**16 / 2)
     rate = raw_data['rate']
@@ -57,7 +58,11 @@ for raw_data in dataset:
 
     # 前処理済みデータを配列に入れる
     p_data.append(data)
-    p_label.append(random.randint(1, 3))
+
+# ラベル
+with open('data/label.txt', 'r') as f:
+    p_label = f.read().split("\n")
+p_label = [int(label) for label in p_label]
 
 # 最大のフレーム数を算出
 max_frame = 0
@@ -100,7 +105,7 @@ criterion = F.cross_entropy
 optimizer = torch.optim.SGD(net.parameters(), lr=0.1)
 
 # エポックの数
-max_epoch = 1
+max_epoch = 100
 
 for epoch in range(max_epoch):
 
@@ -116,7 +121,7 @@ for epoch in range(max_epoch):
 
         # New：正解率の算出
         y_label = torch.argmax(y, dim=1)
-        acc  = torch.sum(y_label == t) * 1.0 / len(t)
+        acc = torch.sum(y_label == t) * 1.0 / len(t)
         print('accuracy:', acc)
 
         loss.backward()
